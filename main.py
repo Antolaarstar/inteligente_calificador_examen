@@ -1,18 +1,21 @@
-from modules.image_preprocessor import mejorar_contraste_para_ocr
-from modules.ocr_reader import leer_texto
+from modules.turbo_ocr import preparar_imagen_turbo, detectar_bloques_manuscritos, leer_ocr_puro
+import cv2
 
-imagen = mejorar_contraste_para_ocr("data/2.jpg")
-texto = leer_texto(imagen)
+# Cargar imagen original
+imagen_original = cv2.imread("data/2.jpg")
 
-print("Procesando imagen...")
-imagen = mejorar_contraste_para_ocr("data/2.jpg")
-print("Imagen procesada.")
+# Preprocesamiento turbo
+imagen_procesada = preparar_imagen_turbo(imagen_original)
 
-print("Aplicando OCR...")
-texto = leer_texto(imagen)
-print("OCR finalizado.")
+# Leer directamente el texto impreso general
+texto_impreso = leer_ocr_puro(imagen_procesada, psm=4)
+print("📄 TEXTO IMPRESO DETECTADO:\n", texto_impreso)
+print("="*60)
 
-print("\nTexto detectado:\n")
-print(texto)
+# Detectar bloques manuscritos
+bloques = detectar_bloques_manuscritos(imagen_procesada)
 
-
+# Leer cada bloque con OCR
+for i, bloque in enumerate(bloques):
+    texto = leer_ocr_puro(bloque, psm=6)
+    print(f"✍️ RESPUESTA MANUSCRITA #{i+1}:\n{texto}\n{'-'*50}")
